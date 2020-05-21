@@ -13,7 +13,7 @@ def readGifImage(path):
 class LHCImage(ImageData):
     N_TARGETS = 1
 
-    PATH_DATASET = ''
+    PATH_DATASET = ''  # You can place here directly the dataset path
     PATH_DATASET_INPUT = PATH_DATASET + 'All247images/'
     PATH_DATASET_GT = PATH_DATASET + 'masks/'
 

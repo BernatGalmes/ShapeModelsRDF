@@ -10,12 +10,17 @@ from shapemodels.Procedure import Procedure
 from shapemodels.Image import ImageData
 
 # set the folder path where the results will be stored
-config.FOLDER_DATA = '/media/bernat/Data/rdf-segmentation/data'
+config.FOLDER_DATA = '/media/bernat/Data/rdf-segmentation/data2'
 
 # set the folder path of the dataset images.
-# The target folder must have two subfolders called 'All247images' and 'masks'
-# with the input and the ground truth images respectively
+# The target folder could have two subfolders called 'All247images' and 'masks'
 LHCImage.PATH_DATASET = '/home/bernat/datasets/LungsHeartClavicles/'
+
+# Input image path
+LHCImage.PATH_DATASET_INPUT = '/home/bernat/datasets/LungsHeartClavicles/All247images/'
+
+# Input labels path
+LHCImage.PATH_DATASET_GT = '/home/bernat/datasets/LungsHeartClavicles/masks/'
 
 # Set it to true to load the classifiers from the previous training
 LOAD_CLASSIFIERS = False
@@ -42,9 +47,9 @@ def main():
     list_imgs_folders = glob(LHCImage.PATH_DATASET_INPUT + '/*.IMG')
 
     logging.info("Normal run ... ")
-    list_train = list_imgs_folders[:50]
-    list_val = list_imgs_folders[150:160]
-    list_test = list_imgs_folders[200:210]
+    list_train = list_imgs_folders[:100]
+    list_val = list_imgs_folders[100:150]
+    list_test = list_imgs_folders[150:]
 
     proc = Procedure(path_results, LHCDataGenerator)
     proc.train_offsets(list_train)
