@@ -328,24 +328,21 @@ class Procedure:
         for i_class, classname in enumerate(self.class_image.CLASSES):
 
             # Load if exists the last hm iteration classifier
-            clf_file = self.path_run + 'clf_' + classname + '_hn_' + str(hm_iterations - 1) + '.sav'
+            clf_file = None
+            if hm_iterations > 0:
+                clf_file = self.path_run + 'clf_' + classname + '_hn_' + str(hm_iterations - 1) + '.sav'
+            elif hm_iterations == 0:
+                clf_file = self.path_run + "clf_" + classname + ".sav"
+
             if os.path.isfile(clf_file) and load_classifiers:
-                clf = helpers.ClfWrap(clf_file, rdf_params,
-                                      force_clf_creation=False, labels=["Other", classname])
-
-                self.classifiers.append(clf)
-                continue
-
-            logging.info("Processing classifier for: %s", classname)
-
-            if (os.path.isfile(self.path_run + "clf_" + classname + ".sav")
-                    and load_classifiers and hm_iterations == 0):
-                clfwrap = helpers.ClfWrap(self.path_run + "clf_" + classname + ".sav", rdf_params,
-                                          force_clf_creation=not load_classifiers, labels=["Other", classname])
+                clfwrap = helpers.ClfWrap(clf_file, rdf_params,
+                                          force_clf_creation=False, labels=["Other", classname])
 
             else:
-
                 # If the classifier is not load from disk build it
+
+                logging.info("Processing classifier for: %s", classname)
+
                 gen_data = self.class_datagen(self.path_data, classname, eph=self.ephs[classname],
                                               mean=self.means[classname], cov=self.covs[classname],
                                               max_samples_mask=max_samples_image, n_samples_file=n_samples_file)
@@ -354,23 +351,22 @@ class Procedure:
                 train_files = gen_data.trainSet.files()
                 val_file = gen_data.testSet.files()
 
-                clfwrap, metrs = self.train_and_report(train_files, val_file, rdf_params,
-                                                       classname,
-                                                       force_clf_creation=True,
-                                                       file_clf=self.path_run + "clf_" + classname + ".sav",
-                                                       file_report=classname)
+                # Train the classifier
+                clfwrap, metrics[classname] = self.train_and_report(train_files, val_file, rdf_params,
+                                                                    classname,
+                                                                    force_clf_creation=True,
+                                                                    file_clf=self.path_run + "clf_" + classname + ".sav",
+                                                                    file_report=classname)
 
-                # store metrics of the resulting class classifier
-                metrics[classname] = metrs
-
+                # If class is configured to perform hard mining
                 if self.class_image.ADD_HN[i_class]:
                     logging.info("Running hard mining of: %s", classname)
 
                     # init metrics with the initial classifier
                     hn_metrics = []
-                    metrs['Iteration'] = 0
-                    metrs['n. HN added (% of negatives)'] = 0
-                    hn_metrics.append(metrs)
+                    metrics[classname]['Iteration'] = 0
+                    metrics[classname]['n. HN added (% of negatives)'] = 0
+                    hn_metrics.append(metrics[classname])
 
                     # Run hard mining procedure
                     clfwrap, hn_metrics = self.hard_mining(clfwrap, hn_metrics, gen_data, classname, list_train,

@@ -58,7 +58,7 @@ class LHCImage(ImageData):
 
 ``` 
 
-* PATH_DATASET: Is not required, but it's useful to identify here the path of the dataset.
+* PATH_DATASET: Is not required, but it's useful to identify here the dataset path .
 * REZIZE_PARAMS: Specification of a dictionary with the parameters of cv2.resize function. You should specify here
 how do you want to resize the images.
 * CLASSES: List of strings. Names of the classes in the dataset.

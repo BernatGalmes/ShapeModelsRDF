@@ -133,9 +133,6 @@ class ClfWrap:
         with open(self.path_clf, 'wb') as handle:
             pickle.dump(self.clf, handle)
 
-    def getHardNegativeSamples(self, test_file):
-        ...
-
     def predict(self, test_file):
         logging.info("predicting data ...")
         if not isinstance(test_file, list):
